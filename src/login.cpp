@@ -3,12 +3,21 @@
 
 void dropout_dl::login::get_cookies(std::string& session, const std::string& login_file) {
 	std::string email;
-	std::string password;
+    std::string password;
 
-	const std::string home = getenv("HOME");
-	const std::string cache_directory = home + "/.cache/dropout-dl/";
-	const std::string cache_file_path = home + "/.cache/dropout-dl/token-cache";
-	std::fstream cache_file(cache_file_path);
+    // Default fallback: ~/.cache/dropout-dl/
+    const char* home = getenv("HOME");
+    std::string cache_directory = std::string(home) + "/.cache/dropout-dl/";
+    
+    // If XDG_CACHE_HOME is set, use it instead
+    const char* xdg_cache = getenv("XDG_CACHE_HOME");
+    if (xdg_cache && *xdg_cache) {
+        cache_directory = std::string(xdg_cache) + "/dropout-dl/";
+    }
+
+    std::filesystem::create_directories(cache_directory);
+    std::string cache_file_path = cache_directory + "token-cache";
+    std::fstream cache_file(cache_file_path);
 
 	/// check if file exist
 	if(!cache_file.fail()) {
