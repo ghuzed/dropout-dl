@@ -540,11 +540,13 @@ namespace dropout_dl {
 	}
 
 	/// TODO: Reimplement size checking. I.E. replace an existing file if the size is not the same
-	bool episode::check_existing(const std::string &quality, const std::string& filename){
-		std::filesystem::path file_path = filename + ".mp4";
-		if (std::filesystem::exists(file_path)) {
-			return true;
+	bool episode::check_existing(const std::string &quality, const std::string& filename) {
+		std::filesystem::path file_path(filename);
+
+		// Append .mp4 only if it doesn't already have it
+		if (file_path.extension() != ".mp4") {
+			file_path += ".mp4";
 		}
-		else return false;
+		return std::filesystem::exists(file_path);
 	}
 } // dropout_dl
